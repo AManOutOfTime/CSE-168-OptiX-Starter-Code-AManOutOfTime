@@ -78,6 +78,31 @@ std::shared_ptr<Scene> SceneLoader::load(std::string sceneFilename)
             scene->outputFilename = svalues[0];
         }
         // TODO: use the examples above to handle other commands
+        else if (cmd == "camera" && readValues(s, 10, fvalues))
+        {
+            scene->eye = optix::make_float3( fvalues[0], fvalues[1], fvalues[2] );
+            scene->center = optix::make_float3( fvalues[3], fvalues[4], fvalues[5] );
+            scene->up = optix::make_float3(fvalues[6], fvalues[7], fvalues[8]);
+            scene->fovy = fvalues[9];
+
+            /*
+            // DEBUG: parsing camera values
+            std::cout << "Cam Values: " << std::endl
+                << "eye.x: " << scene->eye.x
+                << ", eye.y: " << scene->eye.y
+                << ", eye.z: " << scene->eye.z << std::endl
+                << "center.x: " << scene->center.x
+                << ", center.y: " << scene->center.y
+                << ", center.z: " << scene->center.z << std::endl
+                << "up.x: " << scene->up.x
+                << ", up.y: " << scene->up.y
+                << ", up.z: " << scene->up.z << std::endl;
+            std::cout << "fovy: " << scene->fovy << std::endl;
+            */
+
+
+        }
+
     }
 
     in.close();

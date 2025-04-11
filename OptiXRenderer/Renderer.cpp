@@ -41,7 +41,7 @@ void Renderer::initPrograms()
 {
     // Ray generation program
     programs["rayGen"] = createProgram("PinholeCamera.cu", "generateRays");
-    context->setRayGenerationProgram(0, programs["rayGen"]);
+    context->setRayGenerationProgram(0, programs["rayGen"]); // entry point
 
     // Miss progarm
     programs["miss"] = createProgram("Common.cu", "miss");
@@ -123,6 +123,7 @@ void Renderer::buildScene()
     // Record some important info
     width = scene->width;
     height = scene->height;
+    
     outputFilename = scene->outputFilename;
     currentFrame = 0;
     numFrames = 1;
@@ -140,6 +141,12 @@ void Renderer::buildScene()
     material->setAnyHitProgram(1, programs["shadowCaster"]);
 
     // TODO: pass data to programs here
+    programs["rayGen"]["width"]->setFloat(scene->width);
+    programs["rayGen"]["height"]->setFloat(scene->height);
+    programs["rayGen"]["eye"]->setFloat(scene->eye);
+    programs["rayGen"]["center"]->setFloat(scene->center);
+    programs["rayGen"]["up"]->setFloat(scene->up);
+    programs["rayGen"]["fovy"]->setFloat(scene->fovy);
 
     // Create buffers and pass them to Optix programs that the buffers
     Buffer triBuffer = createBuffer(scene->triangles);
