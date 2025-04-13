@@ -51,6 +51,8 @@ std::shared_ptr<Scene> SceneLoader::load(std::string sceneFilename)
 
     // persistent vertex vector for parsing file
     std::vector<optix::float3> verts;
+    // ambient vals
+    optix::float3 currAmb;
     // Read a line in the scene file in each iteration
     while (std::getline(in, str))
     {
@@ -121,6 +123,7 @@ std::shared_ptr<Scene> SceneLoader::load(std::string sceneFilename)
             tempTri.vert0 = verts[ivalues[0]];
             tempTri.vert1 = verts[ivalues[1]];
             tempTri.vert2 = verts[ivalues[2]];
+            tempTri.ambient = currAmb;
             scene->triangles.push_back(tempTri);
         }
         else if (cmd == "sphere" && readValues(s, 4, fvalues))
@@ -128,7 +131,12 @@ std::shared_ptr<Scene> SceneLoader::load(std::string sceneFilename)
             Sphere tempSph;
             tempSph.center = optix::make_float3(fvalues[0], fvalues[1], fvalues[2]);
             tempSph.radius = fvalues[3];
+            tempSph.ambient = currAmb;
             scene->spheres.push_back(tempSph);
+        }
+        else if (cmd == "ambient" && readValues(s, 3, fvalues))
+        {
+            currAmb = optix::make_float3(fvalues[0], fvalues[1], fvalues[2]);
         }
     }
 

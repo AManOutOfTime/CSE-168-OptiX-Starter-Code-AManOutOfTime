@@ -3,6 +3,6 @@
     "",
     "\\OptiXRenderer"
   ],
-  "SelectedNode": "\\OptiXRenderer\\Sphere.cu",
+  "SelectedNode": "\\OptiXRenderer\\SceneLoader.cpp",
   "PreviewInSolutionExplorer": false
 }

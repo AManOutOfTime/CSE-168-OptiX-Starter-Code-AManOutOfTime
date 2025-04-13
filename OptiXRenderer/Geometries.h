@@ -16,6 +16,8 @@ struct Triangle
     optix::float3 vert1;
     optix::float3 vert2;
 
+    optix::float3 ambient;
+
 };
 
 struct Sphere
@@ -25,12 +27,13 @@ struct Sphere
     // TODO: define the sphere structure
     optix::float3 center;
     float radius;
+    optix::float3 ambient;
 
 };
 
 struct Attributes
 {
     
-
+    optix::float3 ambient;
     // TODO: define the attributes structure
 };

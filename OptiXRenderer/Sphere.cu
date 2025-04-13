@@ -23,7 +23,7 @@ RT_PROGRAM void intersect(int primIndex)
     float3 c = sphere.center;
     float r = sphere.radius;
 
-    float discrim = pow( dot(dir, (p0 - c)) , 2.0f ) - pow(length(p0 - c) , 2.0f) + pow(r, 2.0f);
+    float discrim = (dot(dir, (p0 - c)) * dot(dir, (p0 - c))) - (length(p0 - c) * length(p0 - c)) + (r * r);
 
     if (discrim < 0.0f) // no intersection
         return;
@@ -61,7 +61,7 @@ RT_PROGRAM void intersect(int primIndex)
         // Pass attributes
 
         // TODO: assign attribute variables here
-
+        attrib.ambient = sphere.ambient;
         rtReportIntersection(0);
     }
 }
