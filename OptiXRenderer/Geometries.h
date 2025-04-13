@@ -23,7 +23,8 @@ struct Sphere
 
 
     // TODO: define the sphere structure
-
+    optix::float3 center;
+    float radius;
 
 };
 

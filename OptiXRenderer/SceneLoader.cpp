@@ -123,6 +123,13 @@ std::shared_ptr<Scene> SceneLoader::load(std::string sceneFilename)
             tempTri.vert2 = verts[ivalues[2]];
             scene->triangles.push_back(tempTri);
         }
+        else if (cmd == "sphere" && readValues(s, 4, fvalues))
+        {
+            Sphere tempSph;
+            tempSph.center = optix::make_float3(fvalues[0], fvalues[1], fvalues[2]);
+            tempSph.radius = fvalues[3];
+            scene->spheres.push_back(tempSph);
+        }
     }
 
     in.close();

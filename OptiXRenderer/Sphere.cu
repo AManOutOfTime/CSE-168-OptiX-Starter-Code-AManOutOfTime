@@ -18,6 +18,42 @@ RT_PROGRAM void intersect(int primIndex)
     float t;
 
     // TODO: implement sphere intersection test here
+    float3 p0 = ray.origin;
+    float3 dir = ray.direction;
+    float3 c = sphere.center;
+    float r = sphere.radius;
+
+    float discrim = pow( dot(dir, (p0 - c)) , 2.0f ) - pow(length(p0 - c) , 2.0f) + pow(r, 2.0f);
+
+    if (discrim < 0.0f) // no intersection
+        return;
+    else if (discrim == 0.0f) // 1 intersection - tangent
+    {
+        t = dot(-dir, (p0 - c)); // discrim is 0.0f
+        if (t <= 0)
+            return;
+    }
+    else // positive discrim, two intersection
+    {
+        // two possible choices - get smaller positive root
+        float t1 = dot(-1 * dir, (p0 - c)) + sqrt(discrim);
+        float t2 = dot(-1 * dir, (p0 - c)) - sqrt(discrim);
+
+        if (t1 > 0.0f && t2 > 0.0f)
+        {
+            t = (t1 > t2) ? t2 : t1;
+        }
+        else if (t1 > 0.0f)
+        {
+            t = t1;
+        }
+        else if (t2 > 0.0f)
+        {
+            t = t2;
+        }
+        else
+            return;
+    }
 
     // Report intersection (material programs will handle the rest)
     if (rtPotentialIntersection(t))
