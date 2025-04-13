@@ -49,6 +49,8 @@ std::shared_ptr<Scene> SceneLoader::load(std::string sceneFilename)
 
     std::string str, cmd;
 
+    // persistent vertex vector for parsing file
+    std::vector<optix::float3> verts;
     // Read a line in the scene file in each iteration
     while (std::getline(in, str))
     {
@@ -67,6 +69,7 @@ std::shared_ptr<Scene> SceneLoader::load(std::string sceneFilename)
         float fvalues[12];
         int ivalues[3];
         std::string svalues[1];
+        
 
         if (cmd == "size" && readValues(s, 2, fvalues))
         {
@@ -99,10 +102,27 @@ std::shared_ptr<Scene> SceneLoader::load(std::string sceneFilename)
                 << ", up.z: " << scene->up.z << std::endl;
             std::cout << "fovy: " << scene->fovy << std::endl;
             */
-
-
         }
-
+        else if (cmd == "maxverts" && readValues(s, 1, ivalues))
+        {
+            //std::cout << "maxverts" << std::endl; // DEBUG
+            verts.reserve(ivalues[0]); // pushback starting at 0 rather than resize
+        }
+        else if (cmd == "vertex" && readValues(s, 3, fvalues))
+        {
+            //std::cout << "vertex" << std::endl; // DEBUG
+            optix::float3 tVert = optix::make_float3(fvalues[0], fvalues[1], fvalues[2]);
+            verts.push_back(tVert);
+        }
+        else if (cmd == "tri" && readValues(s, 3, ivalues))
+        {
+            // std::cout << "tri" << std::endl;
+            Triangle tempTri;
+            tempTri.vert0 = verts[ivalues[0]];
+            tempTri.vert1 = verts[ivalues[1]];
+            tempTri.vert2 = verts[ivalues[2]];
+            scene->triangles.push_back(tempTri);
+        }
     }
 
     in.close();

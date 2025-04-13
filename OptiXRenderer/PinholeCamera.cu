@@ -40,7 +40,7 @@ RT_PROGRAM void generateRays()
     float3 result = make_float3(0.f);
      
     // TODO: calculate the ray direction (change the following lines)
-    float2 offset = make_float2(0.5f);
+    float2 offset = make_float2(0.5f); // centered
     float2 currPixel = make_float2(launchIndex) + offset;
 
     // modifiers
@@ -50,12 +50,12 @@ RT_PROGRAM void generateRays()
     float u_mod = alpha * aspect * tan(fovy / 2.0f);
     float v_mod = beta * tan(fovy / 2.0f);
 
-    float3 w = normalize(eye - center);
+    float3 w = normalize(center - eye); // switched form eye-center (mirrored output)
     float3 u = normalize(cross(up, w));
     float3 v = cross(w, u);
 
     float3 origin = eye; 
-    float3 dir = normalize(u_mod*u + v_mod*v - w);
+    float3 dir = normalize(w + u_mod*u + v_mod*v); // switched from subtracting w (mirrored output)
     float epsilon = 0.001f; 
 
 

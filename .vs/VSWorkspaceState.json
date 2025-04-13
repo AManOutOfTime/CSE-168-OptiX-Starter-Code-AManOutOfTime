@@ -3,6 +3,6 @@
     "",
     "\\OptiXRenderer"
   ],
-  "SelectedNode": "\\OptiXRenderer\\Renderer.cpp",
+  "SelectedNode": "\\OptiXRenderer\\SceneLoader.cpp",
   "PreviewInSolutionExplorer": false
 }

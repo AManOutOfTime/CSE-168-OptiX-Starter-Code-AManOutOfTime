@@ -12,7 +12,9 @@ struct Triangle
     
 
     // TODO: define the triangle structure
-
+    optix::float3 vert0;
+    optix::float3 vert1;
+    optix::float3 vert2;
 
 };
 
