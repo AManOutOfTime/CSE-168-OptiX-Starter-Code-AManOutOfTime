@@ -45,6 +45,7 @@ std::shared_ptr<Scene> SceneLoader::load(std::string sceneFilename)
 
     auto scene = std::make_shared<Scene>();
 
+    // push identity transform
     transStack.push(optix::Matrix4x4::identity());
 
     std::string str, cmd;
@@ -57,7 +58,7 @@ std::shared_ptr<Scene> SceneLoader::load(std::string sceneFilename)
     while (std::getline(in, str))
     {
         // Ruled out comment and blank lines
-        if ((str.find_first_not_of(" \t\r\n") == std::string::npos) 
+        if ((str.find_first_not_of(" \t\r\n") == std::string::npos)
             || (str[0] == '#'))
         {
             continue;
@@ -71,7 +72,7 @@ std::shared_ptr<Scene> SceneLoader::load(std::string sceneFilename)
         float fvalues[12];
         int ivalues[3];
         std::string svalues[1];
-        
+
 
         if (cmd == "size" && readValues(s, 2, fvalues))
         {
@@ -85,8 +86,8 @@ std::shared_ptr<Scene> SceneLoader::load(std::string sceneFilename)
         // TODO: use the examples above to handle other commands
         else if (cmd == "camera" && readValues(s, 10, fvalues))
         {
-            scene->eye = optix::make_float3( fvalues[0], fvalues[1], fvalues[2] );
-            scene->center = optix::make_float3( fvalues[3], fvalues[4], fvalues[5] );
+            scene->eye = optix::make_float3(fvalues[0], fvalues[1], fvalues[2]);
+            scene->center = optix::make_float3(fvalues[3], fvalues[4], fvalues[5]);
             scene->up = optix::make_float3(fvalues[6], fvalues[7], fvalues[8]);
             scene->fovy = fvalues[9];
 
@@ -120,23 +121,60 @@ std::shared_ptr<Scene> SceneLoader::load(std::string sceneFilename)
         {
             // std::cout << "tri" << std::endl;
             Triangle tempTri;
-            tempTri.vert0 = verts[ivalues[0]];
-            tempTri.vert1 = verts[ivalues[1]];
-            tempTri.vert2 = verts[ivalues[2]];
+            tempTri.vert0 = transformPoint(verts[ivalues[0]]);
+            tempTri.vert1 = transformPoint(verts[ivalues[1]]);
+            tempTri.vert2 = transformPoint(verts[ivalues[2]]);
             tempTri.ambient = currAmb;
             scene->triangles.push_back(tempTri);
         }
         else if (cmd == "sphere" && readValues(s, 4, fvalues))
         {
+            optix::float3 readCenter = optix::make_float3(fvalues[0], fvalues[1], fvalues[2]);
+            float readRadius = fvalues[3];
+
+            // sphere transform
+            optix::Matrix4x4 sTrans = optix::Matrix4x4::translate(readCenter) * optix::Matrix4x4::scale(optix::make_float3(readRadius));
+
             Sphere tempSph;
-            tempSph.center = optix::make_float3(fvalues[0], fvalues[1], fvalues[2]);
-            tempSph.radius = fvalues[3];
+            
+
+            // extract transforms to apply to ray for spheres
+            tempSph.transform = transStack.top() * sTrans;
+            tempSph.inv_transform = tempSph.transform.inverse();
+
+            // treat as unit sphere, now that location/size is extracted
+            tempSph.center = optix::make_float3(0.0f);
+            tempSph.radius = 1.0f;
             tempSph.ambient = currAmb;
             scene->spheres.push_back(tempSph);
         }
         else if (cmd == "ambient" && readValues(s, 3, fvalues))
         {
             currAmb = optix::make_float3(fvalues[0], fvalues[1], fvalues[2]);
+        }
+        else if (cmd == "pushTransform")
+        {
+            transStack.push(transStack.top());
+        }
+        else if (cmd == "popTransform")
+        {
+            transStack.pop();
+        }
+        else if (cmd == "translate" && readValues(s, 3, fvalues))
+        {
+            optix::Matrix4x4 trans = optix::Matrix4x4::translate(optix::make_float3(fvalues[0], fvalues[1], fvalues[2]));
+            rightMultiply(trans);
+        }
+        else if (cmd == "scale" && readValues(s, 3, fvalues))
+        {
+            optix::Matrix4x4 scal = optix::Matrix4x4::scale(optix::make_float3(fvalues[0], fvalues[1], fvalues[2]));
+            rightMultiply(scal);
+        }
+        else if (cmd == "rotate" && readValues(s, 4, fvalues)) // input in degrees, convert to rad
+        {
+            float rad = fvalues[3] * M_PIf / 180.0f;
+            optix::Matrix4x4 rot = optix::Matrix4x4::rotate(rad, optix::make_float3(fvalues[0], fvalues[1], fvalues[2]));
+            rightMultiply(rot);
         }
     }
 

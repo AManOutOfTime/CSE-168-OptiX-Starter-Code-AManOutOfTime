@@ -18,8 +18,11 @@ RT_PROGRAM void intersect(int primIndex)
     float t;
 
     // TODO: implement sphere intersection test here
-    float3 p0 = ray.origin;
-    float3 dir = ray.direction;
+    // apply sphere transform to each ray intersection
+    // with transform calc'd t is in sphere space need to transform back to world
+    float3 p0 = make_float3(sphere.inv_transform * make_float4(ray.origin, 1.0f));
+    float3 dir = normalize(make_float3(sphere.inv_transform * make_float4(ray.direction, 0.0f)));
+    // sphere center = origin in sphere space
     float3 c = sphere.center;
     float r = sphere.radius;
 
@@ -55,8 +58,12 @@ RT_PROGRAM void intersect(int primIndex)
             return;
     }
 
+    float3 sphereHit = (p0 - c) + t * dir;
+    float3 worldHit = make_float3(sphere.transform * make_float4(sphereHit, 1.0f));
+    float worldT = length(worldHit - ray.origin);
+
     // Report intersection (material programs will handle the rest)
-    if (rtPotentialIntersection(t))
+    if (rtPotentialIntersection(worldT))
     {
         // Pass attributes
 

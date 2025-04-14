@@ -29,6 +29,8 @@ struct Sphere
     float radius;
     optix::float3 ambient;
 
+    optix::Matrix4x4 transform;
+    optix::Matrix4x4 inv_transform;
 };
 
 struct Attributes

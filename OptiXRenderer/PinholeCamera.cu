@@ -6,8 +6,6 @@
 
 using namespace optix;
 
-#define M_PIf 3.14159265359f
-
 
 rtBuffer<float3, 2> resultBuffer; // used to store the rendered image result
 
