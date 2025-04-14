@@ -68,7 +68,7 @@ RT_PROGRAM void intersect(int primIndex)
         // Pass attributes
 
         // TODO: assign attribute variables here
-        attrib.ambient = sphere.ambient;
+        attrib = sphere.attrib;
         rtReportIntersection(0);
     }
 }

@@ -83,7 +83,7 @@ RT_PROGRAM void intersect(int primIndex)
         //rtPrintf("t confirmed postcheck %f", t);
         // Pass attributes
         // TODO: assign attribute variables here
-        attrib.ambient = tri.ambient;
+        attrib = tri.attrib;
         rtReportIntersection(0);
     }
 }

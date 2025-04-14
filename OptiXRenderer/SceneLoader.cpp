@@ -53,7 +53,7 @@ std::shared_ptr<Scene> SceneLoader::load(std::string sceneFilename)
     // persistent vertex vector for parsing file
     std::vector<optix::float3> verts;
     // ambient vals
-    optix::float3 currAmb;
+    Attributes currAttrib;
     // Read a line in the scene file in each iteration
     while (std::getline(in, str))
     {
@@ -124,7 +124,7 @@ std::shared_ptr<Scene> SceneLoader::load(std::string sceneFilename)
             tempTri.vert0 = transformPoint(verts[ivalues[0]]);
             tempTri.vert1 = transformPoint(verts[ivalues[1]]);
             tempTri.vert2 = transformPoint(verts[ivalues[2]]);
-            tempTri.ambient = currAmb;
+            tempTri.attrib = currAttrib;
             scene->triangles.push_back(tempTri);
         }
         else if (cmd == "sphere" && readValues(s, 4, fvalues))
@@ -145,12 +145,28 @@ std::shared_ptr<Scene> SceneLoader::load(std::string sceneFilename)
             // treat as unit sphere, now that location/size is extracted
             tempSph.center = optix::make_float3(0.0f);
             tempSph.radius = 1.0f;
-            tempSph.ambient = currAmb;
+            tempSph.attrib = currAttrib;
             scene->spheres.push_back(tempSph);
         }
         else if (cmd == "ambient" && readValues(s, 3, fvalues))
         {
-            currAmb = optix::make_float3(fvalues[0], fvalues[1], fvalues[2]);
+            currAttrib.ambient = optix::make_float3(fvalues[0], fvalues[1], fvalues[2]);
+        }
+        else if (cmd == "diffuse" && readValues(s, 3, fvalues))
+        {
+            currAttrib.diffuse = optix::make_float3(fvalues[0], fvalues[1], fvalues[2]);
+        }
+        else if (cmd == "shininess" && readValues(s, 1, fvalues))
+        {
+            currAttrib.shininess = fvalues[0];
+        }
+        else if (cmd == "emission" && readValues(s, 3, fvalues))
+        {
+            currAttrib.emission = optix::make_float3(fvalues[0], fvalues[1], fvalues[2]);
+        }
+        else if (cmd == "specular" && readValues(s, 3, fvalues))
+        {
+            currAttrib.specular = optix::make_float3(fvalues[0], fvalues[1], fvalues[2]);
         }
         else if (cmd == "pushTransform")
         {
