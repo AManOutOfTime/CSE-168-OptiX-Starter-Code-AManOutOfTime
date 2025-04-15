@@ -27,6 +27,7 @@ struct Scene
     optix::float3 center;
     optix::float3 up;
     float fovy;
+    float maxdepth; // for reflecting
 
     Scene()
     {

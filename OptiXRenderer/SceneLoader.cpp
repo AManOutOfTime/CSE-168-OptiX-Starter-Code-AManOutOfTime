@@ -213,6 +213,10 @@ std::shared_ptr<Scene> SceneLoader::load(std::string sceneFilename)
         {
             currAtten = optix::make_float3(fvalues[0], fvalues[1], fvalues[2]);
         }
+        else if (cmd == "maxdepth" && readValues(s, 1, ivalues))
+        {
+            scene->maxdepth = ivalues[0];
+        }
     }
 
     in.close();

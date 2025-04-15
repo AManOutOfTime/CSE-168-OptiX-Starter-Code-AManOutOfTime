@@ -26,6 +26,7 @@ rtDeclareVariable(optix::float3, eye, , );
 rtDeclareVariable(optix::float3, center, , );
 rtDeclareVariable(optix::float3, up, , );
 rtDeclareVariable(float, fovy, , );
+rtDeclareVariable(float, maxdepth, , );
 
 RT_PROGRAM void generateRays()
 {
@@ -66,6 +67,7 @@ RT_PROGRAM void generateRays()
     // 0 for basic ray, 1 for shadow ray
     Ray ray = make_Ray(origin, dir, 0, epsilon, RT_DEFAULT_MAX);
     Payload payload;
+    payload.maxdepth = maxdepth;
     rtTrace(root, ray, payload);
 
     // Write the result
