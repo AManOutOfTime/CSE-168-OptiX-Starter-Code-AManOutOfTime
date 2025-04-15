@@ -54,6 +54,8 @@ std::shared_ptr<Scene> SceneLoader::load(std::string sceneFilename)
     std::vector<optix::float3> verts;
     // ambient vals
     Attributes currAttrib;
+    // const, lin, quad
+    optix::float3 currAtten = optix::make_float3(1.0f, 0.0f, 0.0f); 
     // Read a line in the scene file in each iteration
     while (std::getline(in, str))
     {
@@ -191,6 +193,25 @@ std::shared_ptr<Scene> SceneLoader::load(std::string sceneFilename)
             float rad = fvalues[3] * M_PIf / 180.0f;
             optix::Matrix4x4 rot = optix::Matrix4x4::rotate(rad, optix::make_float3(fvalues[0], fvalues[1], fvalues[2]));
             rightMultiply(rot);
+        }
+        else if (cmd == "point" && readValues(s, 6, fvalues))
+        {
+            PointLight temp;
+            temp.point = optix::make_float3(fvalues[0], fvalues[1], fvalues[2]);
+            temp.intensity = optix::make_float3(fvalues[3], fvalues[4], fvalues[5]);
+            temp.attenuation = currAtten;
+            scene->plights.push_back(temp);
+        }
+        else if (cmd == "directional" && readValues(s, 6, fvalues))
+        {
+            DirectionalLight temp;
+            temp.direction = optix::make_float3(fvalues[0], fvalues[1], fvalues[2]);
+            temp.intensity = optix::make_float3(fvalues[3], fvalues[4], fvalues[5]);
+            scene->dlights.push_back(temp);
+        }
+        else if (cmd == "attenuation" && readValues(s, 3, fvalues))
+        {
+            currAtten = optix::make_float3(fvalues[0], fvalues[1], fvalues[2]);
         }
     }
 

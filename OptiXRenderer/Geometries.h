@@ -16,6 +16,10 @@ struct Attributes
     float shininess;
     optix::float3 specular;
     optix::float3 emission;
+
+    optix::float3 intersection;
+    optix::float3 normal; // used for lighting
+    optix::float3 view; // used for reflecting
 };
 
 struct Triangle

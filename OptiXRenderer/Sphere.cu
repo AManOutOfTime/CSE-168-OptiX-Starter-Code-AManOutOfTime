@@ -26,6 +26,7 @@ RT_PROGRAM void intersect(int primIndex)
     float3 c = sphere.center;
     float r = sphere.radius;
 
+    // ray-sphere intersection equation
     float discrim = (dot(dir, (p0 - c)) * dot(dir, (p0 - c))) - (length(p0 - c) * length(p0 - c)) + (r * r);
 
     if (discrim < 0.0f) // no intersection
@@ -68,7 +69,34 @@ RT_PROGRAM void intersect(int primIndex)
         // Pass attributes
 
         // TODO: assign attribute variables here
-        attrib = sphere.attrib;
+        attrib.intersection = worldHit; // where intersection happens in world
+        // sphere center and radius is sphere world need to convert to real world
+        float3 normalSphere = normalize(sphereHit - sphere.center); // normal in sphere world
+        // use inverse transpose to convert normal in object space to world space
+
+        // get transpose of sphere.inv_transform:
+        optix::Matrix4x4 invtrans;
+
+        optix::float4 row0 = sphere.inv_transform.getRow(0);
+        optix::float4 row1 = sphere.inv_transform.getRow(1);
+        optix::float4 row2 = sphere.inv_transform.getRow(2);
+        optix::float4 row3 = sphere.inv_transform.getRow(3);
+
+        invtrans.setRow(0, make_float4(row0.x, row1.x, row2.x, row3.x));
+        invtrans.setRow(1, make_float4(row0.y, row1.y, row2.y, row3.y));
+        invtrans.setRow(2, make_float4(row0.z, row1.z, row2.z, row3.z));
+        invtrans.setRow(3, make_float4(row0.w, row1.w, row2.w, row3.w));
+
+        float4 normalWorld = invtrans * make_float4(normalSphere, 0.0f);
+        attrib.normal = normalize(make_float3(normalWorld)); // normal in real world
+
+        attrib.view = normalize(ray.origin - worldHit); // add view ray
+
+        attrib.ambient = sphere.attrib.ambient;
+        attrib.diffuse = sphere.attrib.diffuse;
+        attrib.shininess = sphere.attrib.shininess;
+        attrib.specular = sphere.attrib.specular;
+        attrib.emission = sphere.attrib.emission;
         rtReportIntersection(0);
     }
 }

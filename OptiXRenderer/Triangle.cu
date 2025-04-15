@@ -83,7 +83,22 @@ RT_PROGRAM void intersect(int primIndex)
         //rtPrintf("t confirmed postcheck %f", t);
         // Pass attributes
         // TODO: assign attribute variables here
-        attrib = tri.attrib;
+        float3 intersect = p0 + t * dir;
+        attrib.intersection = intersect;
+
+        // normal for triangle
+        float3 triNormal = normalize( cross(tri.vert1 - tri.vert0, tri.vert2 - tri.vert0) );
+        attrib.normal = triNormal;
+
+        // for reflections/specular
+        attrib.view = normalize(p0 - intersect);
+
+        attrib.ambient = tri.attrib.ambient;
+        attrib.diffuse = tri.attrib.diffuse;
+        attrib.shininess = tri.attrib.shininess;
+        attrib.specular = tri.attrib.specular;
+        attrib.emission = tri.attrib.emission;
+
         rtReportIntersection(0);
     }
 }
