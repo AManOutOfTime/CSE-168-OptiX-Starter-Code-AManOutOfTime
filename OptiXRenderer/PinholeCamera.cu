@@ -39,7 +39,6 @@ RT_PROGRAM void generateRays()
         rtPrintf("Fovy: %f\n", fovy);
     */
 
-    float3 result = make_float3(0.f);
      
     // TODO: calculate the ray direction (change the following lines)
     float fixed_fovy = fovy * M_PIf / 180.0f;// in degrees to radians
@@ -65,11 +64,33 @@ RT_PROGRAM void generateRays()
     // TODO: modify the following lines if you need
     // Shoot a ray to compute the color of the current pixel
     // 0 for basic ray, 1 for shadow ray
-    Ray ray = make_Ray(origin, dir, 0, epsilon, RT_DEFAULT_MAX);
+
+    // iterative for reflections
+    float3 fResult = make_float3(0.0f);
+
+    
     Payload payload;
     payload.maxdepth = maxdepth;
-    rtTrace(root, ray, payload);
+    payload.nOrigin = origin;
+    payload.nDir = dir;
+    payload.done = 0;
+
+
+    do
+    {
+        // trace a ray
+        Ray ray = make_Ray(payload.nOrigin, payload.nDir, 0, epsilon, RT_DEFAULT_MAX);
+        payload.radiance = make_float3(0.0f); // reset to prevent double acc
+        rtTrace(root, ray, payload);
+
+        // acc radiance
+        fResult += payload.radiance;
+    } while (!payload.done && payload.maxdepth > 0);
+
+
+
+
 
     // Write the result
-    resultBuffer[launchIndex] = payload.radiance;
+    resultBuffer[launchIndex] = fResult;
 }

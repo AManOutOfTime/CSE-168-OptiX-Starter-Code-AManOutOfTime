@@ -104,17 +104,19 @@ RT_PROGRAM void closestHit()
     {
         float3 rDir = reflect(attrib.view * -1, attrib.normal);
 
-        Payload rp;
-        rp.radiance = make_float3(0.0f);
-        rp.done = 0;
-        rp.maxdepth = payload.maxdepth - 1;
+        // store next
+        payload.nOrigin = attrib.intersection;
+        payload.nDir = rDir;
+        payload.maxdepth -= 1;
+        payload.done = 0;
 
-        // send out reflection until depth recursively (iterate until depth limit)
-        Ray refRay = make_Ray(attrib.intersection, rDir, 0, EPS, RT_DEFAULT_MAX);
-        rtTrace(root, refRay, rp);
-        
-        result += rp.radiance * attrib.specular;
+        payload.radiance = result * attrib.specular;
+
+    }
+    else
+    {
+        payload.done = 1; // prevent exceeding depth
+        payload.radiance = result;
     }
 
-    payload.radiance = result;
 }

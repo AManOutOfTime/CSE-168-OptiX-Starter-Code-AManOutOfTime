@@ -105,11 +105,37 @@ RT_PROGRAM void bound(int primIndex, float result[6])
 {
     Sphere sphere = spheres[primIndex];
 
+    // using unit sphere in sphere world need to convert to world space
+    // convert all corners of bounding box to cover sphere and then check for min/max
+    float3 box[8];
+    box[0] = make_float3(-1.0f, -1.0f, -1.0f);
+    box[1] = make_float3(1.0f, -1.0f, -1.0f);
+    box[2] = make_float3(-1.0f, 1.0f, -1.0f);
+    box[3] = make_float3(-1.0f, -1.0f, 1.0f);
+    box[4] = make_float3(1.0f, 1.0f, -1.0f);
+    box[5] = make_float3(1.0f, -1.0f, 1.0f);
+    box[6] = make_float3(-1.0f, 1.0f, 1.0f);
+    box[7] = make_float3(1.0f, 1.0f, 1.0f);
     // TODO: implement sphere bouding box
-    result[0] = -1000.f;
-    result[1] = -1000.f;
-    result[2] = -1000.f;
-    result[3] = 1000.f;
-    result[4] = 1000.f;
-    result[5] = 1000.f;
+
+    float3 tbox[8];
+    for (int i = 0; i < 8; i++)
+    {
+        tbox[i] = make_float3(sphere.transform * make_float4(box[i], 1.0f));
+    }
+
+    float3 min = tbox[0];
+    float3 max = tbox[0];
+    for (int i = 1; i < 8; i++)
+    {
+        min = fminf(min, tbox[i]);
+        max = fmaxf(max, tbox[i]);
+    }
+
+    result[0] = min.x;
+    result[1] = min.y;
+    result[2] = min.z;
+    result[3] = max.x;
+    result[4] = max.y;
+    result[5] = max.z;
 }
